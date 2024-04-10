@@ -36,9 +36,7 @@ export default function RootLayout({
           </div>
         </nav>
         <main className="flex flex-row items-center justify-center w-full flex-1 text-center md:flex-col sm:flex-col">
-          <div className="grid grid-cols-auto-fit-300 place-items-center gap-5 w-5/6">
             {children}
-          </div>
         </main>
       </body>
     </html>

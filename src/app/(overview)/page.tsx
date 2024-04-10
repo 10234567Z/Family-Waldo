@@ -1,41 +1,51 @@
 'use client'
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { createClient } from "@/utils/supabase/client";
-import useSWR from "swr";
-import Image from "next/image";
-import Link from "next/link";
-
-const fetcher = async () => {
-  const supabase = createClient()
-  const { data: images, error } = await supabase
-    .storage
-    .from('images')
-    .list()
-
-  if (error) throw error
-
-  const files = []
-  if (images) {
-    for (let i = 0; i < images.length; i++) {
-      const { data, error } = await supabase.storage.from('images').download(images[i].name)
-      if (error) throw error
-      files.push(data)
-    }
-  }
-
-  return files
-}
 
 export default function Home() {
-  const { data: files, error, isLoading } = useSWR('fetchImages', fetcher)
+  const [files, setFiles] = useState<Blob[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      const { data: images, error: listError } = await supabase.storage.from('images').list();
+      if (listError) {
+        setError(listError.message);
+        return;
+      }
+
+      const fetchedFiles: Blob[] = [];
+      for (let i = 0; i < images.length; i++) {
+        const { data, error: downloadError } = await supabase.storage.from('images').download(images[i].name);
+        if (downloadError) {
+          setError(downloadError.message);
+          return;
+        }
+        fetchedFiles.push(data);
+      }
+
+      setFiles(fetchedFiles);
+    };
+
+    fetchImages();
+
+    // Cleanup function
+    return () => {
+      setFiles([]);
+    };
+  }, []);
 
   if (error) return <div>{error}</div>
-  if (!files) return (
+  if (!files.length) return (
     <div className="flex flex-col items-center justify-center">
-      <Image src="/loading.svg" alt="Logo" width={200} height={200} className=" rounded-md shadow-sm hover:scale-110  transition-all ease-linear duration-300 " />
+      <Image src="/loading.svg" alt="Logo" width={200} height={200} className=" rounded-md shadow-sm transition-all ease-linear duration-300 " />
     </div>
   )
   return (
-    <>
+    <div className="grid grid-cols-auto-fit-300 place-items-center gap-5 w-5/6">
       {
         files.map((file, index) => {
           return (
@@ -50,6 +60,6 @@ export default function Home() {
           )
         })
       }
-    </>
+    </div>
   );
 }
