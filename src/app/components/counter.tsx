@@ -11,6 +11,8 @@ export default function Counter(){
     }, [])
 
     return (
-        <h1>{second}</h1>
+        <div className="w-[50px]">
+        <h1 className=" text-lg p-4 " >{second}</h1>
+        </div>
     )
 }
