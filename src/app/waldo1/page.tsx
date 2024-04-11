@@ -125,9 +125,9 @@ export default function Home() {
             <div className="flex flex-row items-center justify-center gap-1 p-0.5" style={{ position: 'absolute', top: `${coords.y}`, left: `${coords.x}`, visibility: coords.visible ? 'visible' : 'hidden' }}>
                 <div className=" border-4 rounded-md border-yellow-400 w-12 h-12 shadow-md" />
                 <div className="grid grid-rows-half grid-flow-col place-items-center gap-1">
-                    <Image src='/waldo.png' alt="Logo" width={30} height={30} className=" rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWaldoClick} style={{ visibility: foundWaldo ? "collapse" : "visible" }} />
-                    <Image src='/wilma.png' alt="Logo" width={30} height={30} className="rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWilmaClick} style={{ visibility: foundWilma ? "collapse" : "visible" }} />
-                    <Image src='/wizard.jpg' alt="Logo" width={30} height={30} className=" rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWizardClick} style={{ visibility: foundWizard ? "collapse" : "visible" }} />
+                    <Image src='/waldo.png' alt="Logo" width={30} height={30} className=" rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWaldoClick} style={{ display: foundWaldo ? "none" : "block" }} />
+                    <Image src='/wilma.png' alt="Logo" width={30} height={30} className="rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWilmaClick} style={{ display: foundWilma ? "none" : "block" }} />
+                    <Image src='/wizard.jpg' alt="Logo" width={30} height={30} className=" rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWizardClick} style={{ display: foundWizard ? "none" : "block" }} />
                 </div>
             </div>
             {

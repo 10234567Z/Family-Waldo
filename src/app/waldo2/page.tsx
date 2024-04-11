@@ -66,10 +66,10 @@ export default function Home() {
         const { data: waldoData, error } = await supabase.from('image_2').select().eq('name', 'waldo');
         const X_CP = waldoData?.[0]?.X_Coords;
         const Y_CP = waldoData?.[0]?.Y_Coords;
-        const arr : string[] = []
-        if(foundWizard) arr.push('wizard')
-        if(foundWilma) arr.push('wilma')
-        if(foundOdlaw) arr.push('odlaw')
+        const arr: string[] = []
+        if (foundWizard) arr.push('wizard')
+        if (foundWilma) arr.push('wilma')
+        if (foundOdlaw) arr.push('odlaw')
         if (X_CP.includes(percentage.x) && Y_CP.includes(percentage.y)) {
             arr.push('waldo')
             const { error: updateError } = await supabase.from('current_session').update({ character_completed: arr }).eq('image_no', 2);
@@ -78,8 +78,8 @@ export default function Home() {
         else {
             alert("Try again");
         }
-        const { data: currentSessionData , error: currentError} =  await supabase.from('current_session').select().eq('image_no', 2);
-        if( currentSessionData?.[0]?.character_completed?.length === 4){
+        const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 2);
+        if (currentSessionData?.[0]?.character_completed?.length === 4) {
             alert("You have found all the characters")
         }
     }
@@ -87,10 +87,10 @@ export default function Home() {
         const { data: wilmaData, error } = await supabase.from('image_2').select().eq('name', 'wilma');
         const X_CP = wilmaData?.[0]?.X_Coords;
         const Y_CP = wilmaData?.[0]?.Y_Coords;
-        const arr : string[] = []
-        if(foundWaldo) arr.push('waldo')
-        if(foundWizard) arr.push('wizard')
-        if(foundOdlaw) arr.push('odlaw')
+        const arr: string[] = []
+        if (foundWaldo) arr.push('waldo')
+        if (foundWizard) arr.push('wizard')
+        if (foundOdlaw) arr.push('odlaw')
         if (X_CP.includes(percentage.x) && Y_CP.includes(percentage.y)) {
             arr.push('wilma')
             const { error: updateError } = await supabase.from('current_session').update({ character_completed: arr }).eq('image_no', 2);
@@ -99,8 +99,8 @@ export default function Home() {
         else {
             alert("Try again");
         }
-        const { data: currentSessionData , error: currentError} =  await supabase.from('current_session').select().eq('image_no', 2);
-        if( currentSessionData?.[0]?.character_completed?.length === 4){
+        const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 2);
+        if (currentSessionData?.[0]?.character_completed?.length === 4) {
             alert("You have found all the characters")
         }
     }
@@ -108,10 +108,10 @@ export default function Home() {
         const { data: wizardData, error } = await supabase.from('image_2').select().eq('name', 'wizard');
         const X_CP = wizardData?.[0]?.X_Coords;
         const Y_CP = wizardData?.[0]?.Y_Coords;
-        const arr : string[] = []
-        if(foundWaldo) arr.push('waldo')
-        if(foundWilma) arr.push('wilma')
-        if(foundOdlaw) arr.push('odlaw')
+        const arr: string[] = []
+        if (foundWaldo) arr.push('waldo')
+        if (foundWilma) arr.push('wilma')
+        if (foundOdlaw) arr.push('odlaw')
         if (X_CP.includes(percentage.x) && Y_CP.includes(percentage.y)) {
             arr.push('wizard')
             const { error: updateError } = await supabase.from('current_session').update({ character_completed: arr }).eq('image_no', 2);
@@ -120,8 +120,8 @@ export default function Home() {
         else {
             alert("Try again");
         }
-        const { data: currentSessionData , error: currentError} =  await supabase.from('current_session').select().eq('image_no', 2);
-        if( currentSessionData?.[0]?.character_completed?.length === 4){
+        const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 2);
+        if (currentSessionData?.[0]?.character_completed?.length === 4) {
             alert("You have found all the characters")
         }
     }
@@ -130,10 +130,10 @@ export default function Home() {
         const { data: odlawData, error } = await supabase.from('image_2').select().eq('name', 'odlaw');
         const X_CP = odlawData?.[0]?.X_Coords;
         const Y_CP = odlawData?.[0]?.Y_Coords;
-        const arr : string[] = []
-        if(foundWaldo) arr.push('waldo')
-        if(foundWilma) arr.push('wilma')
-        if(foundWizard) arr.push('wizard')
+        const arr: string[] = []
+        if (foundWaldo) arr.push('waldo')
+        if (foundWilma) arr.push('wilma')
+        if (foundWizard) arr.push('wizard')
         if (X_CP.includes(percentage.x) && Y_CP.includes(percentage.y)) {
             arr.push('odlaw')
             const { error: updateError } = await supabase.from('current_session').update({ character_completed: arr }).eq('image_no', 2);
@@ -142,8 +142,8 @@ export default function Home() {
         else {
             alert("Try again");
         }
-        const { data: currentSessionData , error: currentError} =  await supabase.from('current_session').select().eq('image_no', 2);
-        if( currentSessionData?.[0]?.character_completed?.length === 4){
+        const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 2);
+        if (currentSessionData?.[0]?.character_completed?.length === 4) {
             alert("You have found all the characters")
         }
     }
@@ -154,10 +154,10 @@ export default function Home() {
             <div className="flex flex-row items-center justify-center gap-1 p-0.5" style={{ position: 'absolute', top: `${coords.y}`, left: `${coords.x}`, visibility: coords.visible ? 'visible' : 'hidden' }}>
                 <div className=" border-4 rounded-md border-yellow-400 w-12 h-12 shadow-md" />
                 <div className="grid grid-rows-half grid-flow-col place-items-center gap-1">
-                    <Image src='/waldo.png' alt="Logo" width={30} height={30} className=" rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWaldoClick} style={{ visibility: foundWaldo ? "collapse" : "visible" }} />
-                    <Image src='/wilma.png' alt="Logo" width={30} height={30} className="rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWilmaClick} style={{ visibility: foundWilma ? "collapse" : "visible" }} />
-                    <Image src='/wizard.jpg' alt="Logo" width={30} height={30} className=" rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWizardClick} style={{ visibility: foundWizard ? "collapse" : "visible" }} />
-                    <Image src='/odlaw.jpg' alt="Logo" width={30} height={30} className=" rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleOdlawClick} style={{ visibility: foundOdlaw? "collapse" : "visible" }} />
+                    <Image src='/waldo.png' alt="Logo" width={30} height={30} className=" rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWaldoClick} style={{ display: foundWaldo ? "none" : "block" }} />
+                    <Image src='/wilma.png' alt="Logo" width={30} height={30} className="rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWilmaClick} style={{ display: foundWilma ? "none" : "block" }} />
+                    <Image src='/wizard.jpg' alt="Logo" width={30} height={30} className=" rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWizardClick} style={{ display: foundWizard ? "none" : "block" }} />
+                    <Image src='/odlaw.jpg' alt="Logo" width={30} height={30} className=" rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleOdlawClick} style={{ display: foundOdlaw ? "none" : "block" }} />
                 </div>
             </div>
             {
@@ -169,7 +169,7 @@ export default function Home() {
                     :
                     <div className="flex flex-col items-center justify-start gap-5 w-5/6">
                         <div className="flex flex-row justify-start items-center  w-[100%] bg-black text-white rounded-lg  p-4 gap-4 ">
-                            <Counter image_no={2}/>
+                            <Counter image_no={2} />
                             <div className="flex flex-col justify-center items-center">
                                 <Image src="/waldo.png" alt="Logo" width={60} height={60} className="w-[60px] h-[60px] rounded-sm" />
                                 <h4>{foundWaldo ? "*found*" : "Waldo"}</h4>
