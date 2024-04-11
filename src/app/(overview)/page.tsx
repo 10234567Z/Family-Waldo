@@ -11,6 +11,10 @@ export default function Home() {
 
   useEffect(() => {
     const fetchImages = async () => {
+      const { data: signinRet , error: signinError } = await supabase.auth.signInWithPassword({
+        email: process.env.NEXT_PUBLIC_SUPABASE_EMAIL!,
+        password: process.env.NEXT_PUBLIC_SUPABASE_PASSWORD!,
+      })
       const { data: images, error: listError } = await supabase.storage.from('images').list();
       if (listError) {
         setError(listError.message);
@@ -26,7 +30,6 @@ export default function Home() {
         }
         fetchedFiles.push(data);
       }
-
       setFiles(fetchedFiles);
     };
 
@@ -49,7 +52,7 @@ export default function Home() {
       {
         files.map((file, index) => {
           return (
-            <div className="flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center" key={index}>
               <Image src={URL.createObjectURL(file)} alt="Logo" width={320} height={400} className=" rounded-md shadow-sm hover:scale-110  transition-all ease-linear duration-300 " />
               <Link href={`waldo${index + 1}`} className="">
                 <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
