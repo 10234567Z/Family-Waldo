@@ -7,7 +7,11 @@ import Counter from "../components/counter";
 export default function Home() {
     const [image, setImage] = useState<Blob | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [coords, setCoords] = useState<{ x: string, y: string, visible: boolean }>({ x: '0px', y: '0px', visible: false });
+    const [foundWaldo, setFoundWaldo] = useState<boolean>(false);
+    const [foundWilma, setFoundWilma] = useState<boolean>(false);
+    const [foundWizard, setFoundWizard] = useState<boolean>(false);
+    const [coords, setCoords] = useState<{ x: string, y: string, visible: boolean }>({ x: '-10000px', y: '-10000px', visible: false });
+    const [percentage, setPercentage] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
     const supabase = createClient();
     useEffect(() => {
         const fetchImage = async () => {
@@ -37,37 +41,93 @@ export default function Home() {
     }, []);
 
     const handleImgHover: MouseEventHandler<HTMLImageElement> | undefined = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-        const target = e.target as HTMLImageElement;
-        const rect = target.getBoundingClientRect();
-
-        const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
-        const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
         if (coords.visible) {
-            setCoords({ x: '0px', y: '0px', visible: false })
+            setCoords({ x: '-10000px', y: '-10000px', visible: false })
         }
     }
 
     const handleClick: MouseEventHandler<HTMLImageElement> | undefined = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
         const target = e.target as HTMLImageElement;
-        setCoords({ x: `${e.clientX - 24}px`, y: `${e.clientY - 24}px`, visible: true })
-    }
-    const handleWaldoClick: MouseEventHandler<HTMLImageElement> | undefined = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+        const rect = target.getBoundingClientRect();
 
+        const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+        const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+        setPercentage({ x, y });
+        setCoords({ x: `${e.clientX - 30}px`, y: `${e.clientY - 30}px`, visible: true })
     }
-    const handleWilmaClick: MouseEventHandler<HTMLImageElement> | undefined = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
 
+    /** 
+     * Handle character choosen clicks
+     * 
+     */
+    const handleWaldoClick: MouseEventHandler<HTMLImageElement> | undefined = async (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+        const { data: waldoData, error } = await supabase.from('image_1').select().eq('name', 'waldo');
+        const X_CP = waldoData?.[0]?.X_Coords;
+        const Y_CP = waldoData?.[0]?.Y_Coords;
+        const arr : string[] = []
+        if(foundWizard) arr.push('wizard')
+        if(foundWilma) arr.push('wilma')
+        if (X_CP.includes(percentage.x) && Y_CP.includes(percentage.y)) {
+            arr.push('waldo')
+            const { error: updateError } = await supabase.from('current_session').update({ character_completed: arr }).eq('image_no', 1);
+            setFoundWaldo(true);
+        }
+        else {
+            alert("Try again");
+        }
+        const { data: currentSessionData , error: currentError} =  await supabase.from('current_session').select().eq('image_no', 1);
+        if( currentSessionData?.[0]?.character_completed?.length === 3){
+            alert("You have found all the characters")
+        }
     }
-    const handleWizardClick: MouseEventHandler<HTMLImageElement> | undefined = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-
+    const handleWilmaClick: MouseEventHandler<HTMLImageElement> | undefined = async (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+        const { data: wilmaData, error } = await supabase.from('image_1').select().eq('name', 'wilma');
+        const X_CP = wilmaData?.[0]?.X_Coords;
+        const Y_CP = wilmaData?.[0]?.Y_Coords;
+        const arr : string[] = []
+        if(foundWaldo) arr.push('waldo')
+        if(foundWizard) arr.push('wizard')
+        if (X_CP.includes(percentage.x) && Y_CP.includes(percentage.y)) {
+            arr.push('wilma')
+            const { error: updateError } = await supabase.from('current_session').update({ character_completed: arr }).eq('image_no', 1);
+            setFoundWilma(true);
+        }
+        else {
+            alert("Try again");
+        }
+        const { data: currentSessionData , error: currentError} =  await supabase.from('current_session').select().eq('image_no', 1);
+        if( currentSessionData?.[0]?.character_completed?.length === 3){
+            alert("You have found all the characters")
+        }
+    }
+    const handleWizardClick: MouseEventHandler<HTMLImageElement> | undefined = async (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+        const { data: wizardData, error } = await supabase.from('image_1').select().eq('name', 'wizard');
+        const X_CP = wizardData?.[0]?.X_Coords;
+        const Y_CP = wizardData?.[0]?.Y_Coords;
+        const arr : string[] = []
+        if(foundWaldo) arr.push('waldo')
+        if(foundWilma) arr.push('wilma')
+        if (X_CP.includes(percentage.x) && Y_CP.includes(percentage.y)) {
+            arr.push('wizard')
+            const { error: updateError } = await supabase.from('current_session').update({ character_completed: arr }).eq('image_no', 1);
+            setFoundWizard(true);
+        }
+        else {
+            alert("Try again");
+        }
+        const { data: currentSessionData , error: currentError} =  await supabase.from('current_session').select().eq('image_no', 1);
+        if( currentSessionData?.[0]?.character_completed?.length === 3){
+            alert("You have found all the characters")
+        }
     }
     return (
         <>
-            <div className="flex flex-row items-center justify-center gap-1 " style={{ position: 'absolute', top: `${coords.y}`, left: `${coords.x}`, visibility: coords.visible ? 'visible' : 'hidden' }}>
+            <div className="flex flex-row items-center justify-center gap-1 p-0.5" style={{ position: 'absolute', top: `${coords.y}`, left: `${coords.x}`, visibility: coords.visible ? 'visible' : 'hidden' }}>
                 <div className=" border-4 rounded-md border-yellow-400 w-12 h-12 shadow-md" />
                 <div className="grid grid-rows-half grid-flow-col place-items-center gap-1">
-                    <Image src='/waldo.png' alt="Logo" width={30} height={30} className=" rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWaldoClick}/>
-                    <Image src='/wilma.png' alt="Logo" width={30} height={30} className="rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black"  onClick={handleWilmaClick}/>
-                    <Image src='/wizard.jpg' alt="Logo" width={30} height={30} className=" rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWizardClick}/>
+                    <Image src='/waldo.png' alt="Logo" width={30} height={30} className=" rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWaldoClick} style={{ visibility: foundWaldo ? "collapse" : "visible" }} />
+                    <Image src='/wilma.png' alt="Logo" width={30} height={30} className="rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWilmaClick} style={{ visibility: foundWilma ? "collapse" : "visible" }} />
+                    <Image src='/wizard.jpg' alt="Logo" width={30} height={30} className=" rounded-sm w-[30px] h-[30px] cursor-pointer border-2 border-black" onClick={handleWizardClick} style={{ visibility: foundWizard ? "collapse" : "visible" }} />
                 </div>
             </div>
             {
@@ -82,15 +142,15 @@ export default function Home() {
                             <Counter image_no={1} />
                             <div className="flex flex-col justify-center items-center">
                                 <Image src="/waldo.png" alt="Logo" width={60} height={60} className="w-[60px] h-[60px] rounded-sm" />
-                                <h4>Waldo</h4>
+                                <h4>{foundWaldo ? "*Found*" : "Waldo"}</h4>
                             </div>
                             <div className="flex flex-col justify-center items-center">
                                 <Image src="/wilma.png" alt="Logo" width={60} height={60} className="w-[60px] h-[60px] rounded-sm" />
-                                <h4>Wilma</h4>
+                                <h4>{foundWilma ? "*Found*" : "Wilma"}</h4>
                             </div>
                             <div className="flex flex-col justify-center items-center">
                                 <Image src="/wizard.jpg" alt="Logo" width={60} height={60} className="w-[60px] h-[60px] rounded-sm" />
-                                <h4>Wizard</h4>
+                                <h4>{foundWizard ? "*Found*" : "Wizard"}</h4>
                             </div>
                         </div>
                         <Image onMouseMove={handleImgHover} onClick={handleClick} src={image ? URL.createObjectURL(image) : ''} alt="Logo" width={320} height={400} className=" rounded-md shadow-sm w-[100%]" />
