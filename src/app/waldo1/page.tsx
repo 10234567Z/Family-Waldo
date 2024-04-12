@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import { MouseEventHandler, useEffect, useState } from "react";
 import Counter from "../components/counter";
+import { navigate } from "../components/redirectAction";
 
 export default function Home() {
     const [image, setImage] = useState<Blob | null>(null);
@@ -13,6 +14,10 @@ export default function Home() {
     const [coords, setCoords] = useState<{ x: string, y: string, visible: boolean }>({ x: '-10000px', y: '-10000px', visible: false });
     const [percentage, setPercentage] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
     const [again, setAgain] = useState<boolean>(false)
+    const [success, setSuccess] = useState<boolean>(false)
+    const [playerName, setPlayerName] = useState<string>("")
+    const [stop, setStop] = useState<boolean>(false)
+
     const supabase = createClient();
     useEffect(() => {
         const fetchImage = async () => {
@@ -59,6 +64,12 @@ export default function Home() {
         setPercentage({ x, y });
         setCoords({ x: `${e.clientX - 30}px`, y: `${e.clientY - 30}px`, visible: true })
     }
+    const handleSubmit: MouseEventHandler<HTMLButtonElement> | undefined = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        const { data: sessionData, error: fetchError } = await supabase.from('current_session').select('seconds').eq('image_no', 1)
+        const seconds = sessionData?.[0].seconds
+        const { data, error } = await supabase.from('Leaderboard_Image_1').insert([{ name: playerName, seconds: seconds }])
+        navigate()
+    }
 
     /** 
      * Handle character choosen clicks
@@ -83,7 +94,8 @@ export default function Home() {
         }
         const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 1);
         if (currentSessionData?.[0]?.character_completed?.length === 3) {
-            alert("You have found all the characters")
+            setStop(true)
+            setSuccess(true)
         }
     }
     const handleWilmaClick: MouseEventHandler<HTMLImageElement> | undefined = async (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
@@ -105,7 +117,8 @@ export default function Home() {
         }
         const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 1);
         if (currentSessionData?.[0]?.character_completed?.length === 3) {
-            alert("You have found all the characters")
+            setStop(true)
+            setSuccess(true)
         }
     }
     const handleWizardClick: MouseEventHandler<HTMLImageElement> | undefined = async (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
@@ -127,11 +140,17 @@ export default function Home() {
         }
         const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 1);
         if (currentSessionData?.[0]?.character_completed?.length === 3) {
-            alert("You have found all the characters")
+            setStop(true)
+            setSuccess(true)
         }
     }
     return (
         <>
+            <div className="absolute top-0 left-0 w-full h-full bg-black opacity-90 gap-2  p-2  z-50 flex flex-col items-center justify-center rounded-sm translate-x-4 transition-all" style={{ display: success ? "flex" : "none", transform: success ? "translateX(0)" : "translateX(1rem)" }}>
+                <h1 className="text-2xl text-white">Congratz! You found all characters</h1>
+                <input type="text" placeholder="Enter your name" className="p-2 rounded-md" onChange={(e) => setPlayerName(e.target.value)} value={playerName} required />
+                <button className="p-2 bg-green-500 text-white rounded-md" onClick={handleSubmit}>Submit</button>
+            </div>
             <div className="absolute top-0 left-[40%] bg-red-600 p-2  z-50 flex flex-col items-center justify-center rounded-sm" style={{ display: again ? "flex" : "none" }}>
                 <h1 className="text-3xl text-white">Try Again</h1>
             </div>
@@ -152,7 +171,7 @@ export default function Home() {
                     :
                     <div className="flex flex-col items-center justify-start gap-5 w-5/6">
                         <div className="flex flex-row justify-start items-center  w-[100%] bg-black text-white rounded-lg  p-4 gap-4 ">
-                            <Counter image_no={1} />
+                            <Counter image_no={1} stop={stop} />
                             <div className="flex flex-col justify-center items-center">
                                 <Image src="/waldo.png" alt="Logo" width={60} height={60} className="w-[60px] h-[60px] rounded-sm" />
                                 <h4>{foundWaldo ? "*Found*" : "Waldo"}</h4>
