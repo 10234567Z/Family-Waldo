@@ -13,6 +13,7 @@ export default function Home() {
     const [foundOdlaw, setFoundOdlaw] = useState<boolean>(false);
     const [coords, setCoords] = useState<{ x: string, y: string, visible: boolean }>({ x: '-10000px', y: '-10000px', visible: false });
     const [percentage, setPercentage] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
+    const [again, setAgain] = useState<boolean>(false)
     const supabase = createClient();
     useEffect(() => {
         const fetchImage = async () => {
@@ -45,6 +46,9 @@ export default function Home() {
         if (coords.visible) {
             setCoords({ x: '-10000px', y: '-10000px', visible: false })
         }
+        if (again) {
+            setAgain(false)
+        }
     }
 
     const handleClick: MouseEventHandler<HTMLImageElement> | undefined = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
@@ -76,7 +80,9 @@ export default function Home() {
             setFoundWaldo(true);
         }
         else {
-            alert("Try again");
+            return (
+                setAgain(true)
+            )
         }
         const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 2);
         if (currentSessionData?.[0]?.character_completed?.length === 4) {
@@ -97,7 +103,9 @@ export default function Home() {
             setFoundWilma(true);
         }
         else {
-            alert("Try again");
+            return (
+                setAgain(true)
+            )
         }
         const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 2);
         if (currentSessionData?.[0]?.character_completed?.length === 4) {
@@ -118,7 +126,9 @@ export default function Home() {
             setFoundWizard(true);
         }
         else {
-            alert("Try again");
+            return (
+                setAgain(true)
+            )
         }
         const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 2);
         if (currentSessionData?.[0]?.character_completed?.length === 4) {
@@ -140,7 +150,9 @@ export default function Home() {
             setFoundOdlaw(true);
         }
         else {
-            alert("Try again");
+            return (
+                setAgain(true)
+            )
         }
         const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 2);
         if (currentSessionData?.[0]?.character_completed?.length === 4) {
@@ -151,6 +163,9 @@ export default function Home() {
 
     return (
         <>
+            <div className="absolute top-0 left-[40%] bg-red-600 p-2  z-50 flex flex-col items-center justify-center rounded-sm" style={{ display: again ? "flex" : "none" }}>
+                <h1 className="text-3xl text-white">Try Again</h1>
+            </div>
             <div className="flex flex-row items-center justify-center gap-1 p-0.5" style={{ position: 'absolute', top: `${coords.y}`, left: `${coords.x}`, visibility: coords.visible ? 'visible' : 'hidden' }}>
                 <div className=" border-4 rounded-md border-yellow-400 w-12 h-12 shadow-md" />
                 <div className="grid grid-rows-half grid-flow-col place-items-center gap-1">

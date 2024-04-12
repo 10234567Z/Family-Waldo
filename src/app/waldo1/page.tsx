@@ -12,6 +12,7 @@ export default function Home() {
     const [foundWizard, setFoundWizard] = useState<boolean>(false);
     const [coords, setCoords] = useState<{ x: string, y: string, visible: boolean }>({ x: '-10000px', y: '-10000px', visible: false });
     const [percentage, setPercentage] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
+    const [again, setAgain] = useState<boolean>(false)
     const supabase = createClient();
     useEffect(() => {
         const fetchImage = async () => {
@@ -44,6 +45,9 @@ export default function Home() {
         if (coords.visible) {
             setCoords({ x: '-10000px', y: '-10000px', visible: false })
         }
+        if (again) {
+            setAgain(false)
+        }
     }
 
     const handleClick: MouseEventHandler<HTMLImageElement> | undefined = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
@@ -64,19 +68,21 @@ export default function Home() {
         const { data: waldoData, error } = await supabase.from('image_1').select().eq('name', 'waldo');
         const X_CP = waldoData?.[0]?.X_Coords;
         const Y_CP = waldoData?.[0]?.Y_Coords;
-        const arr : string[] = []
-        if(foundWizard) arr.push('wizard')
-        if(foundWilma) arr.push('wilma')
+        const arr: string[] = []
+        if (foundWizard) arr.push('wizard')
+        if (foundWilma) arr.push('wilma')
         if (X_CP.includes(percentage.x) && Y_CP.includes(percentage.y)) {
             arr.push('waldo')
             const { error: updateError } = await supabase.from('current_session').update({ character_completed: arr }).eq('image_no', 1);
             setFoundWaldo(true);
         }
         else {
-            alert("Try again");
+            return (
+                setAgain(true)
+            )
         }
-        const { data: currentSessionData , error: currentError} =  await supabase.from('current_session').select().eq('image_no', 1);
-        if( currentSessionData?.[0]?.character_completed?.length === 3){
+        const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 1);
+        if (currentSessionData?.[0]?.character_completed?.length === 3) {
             alert("You have found all the characters")
         }
     }
@@ -84,19 +90,21 @@ export default function Home() {
         const { data: wilmaData, error } = await supabase.from('image_1').select().eq('name', 'wilma');
         const X_CP = wilmaData?.[0]?.X_Coords;
         const Y_CP = wilmaData?.[0]?.Y_Coords;
-        const arr : string[] = []
-        if(foundWaldo) arr.push('waldo')
-        if(foundWizard) arr.push('wizard')
+        const arr: string[] = []
+        if (foundWaldo) arr.push('waldo')
+        if (foundWizard) arr.push('wizard')
         if (X_CP.includes(percentage.x) && Y_CP.includes(percentage.y)) {
             arr.push('wilma')
             const { error: updateError } = await supabase.from('current_session').update({ character_completed: arr }).eq('image_no', 1);
             setFoundWilma(true);
         }
         else {
-            alert("Try again");
+            return (
+                setAgain(true)
+            )
         }
-        const { data: currentSessionData , error: currentError} =  await supabase.from('current_session').select().eq('image_no', 1);
-        if( currentSessionData?.[0]?.character_completed?.length === 3){
+        const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 1);
+        if (currentSessionData?.[0]?.character_completed?.length === 3) {
             alert("You have found all the characters")
         }
     }
@@ -104,24 +112,29 @@ export default function Home() {
         const { data: wizardData, error } = await supabase.from('image_1').select().eq('name', 'wizard');
         const X_CP = wizardData?.[0]?.X_Coords;
         const Y_CP = wizardData?.[0]?.Y_Coords;
-        const arr : string[] = []
-        if(foundWaldo) arr.push('waldo')
-        if(foundWilma) arr.push('wilma')
+        const arr: string[] = []
+        if (foundWaldo) arr.push('waldo')
+        if (foundWilma) arr.push('wilma')
         if (X_CP.includes(percentage.x) && Y_CP.includes(percentage.y)) {
             arr.push('wizard')
             const { error: updateError } = await supabase.from('current_session').update({ character_completed: arr }).eq('image_no', 1);
             setFoundWizard(true);
         }
         else {
-            alert("Try again");
+            return (
+                setAgain(true)
+            )
         }
-        const { data: currentSessionData , error: currentError} =  await supabase.from('current_session').select().eq('image_no', 1);
-        if( currentSessionData?.[0]?.character_completed?.length === 3){
+        const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 1);
+        if (currentSessionData?.[0]?.character_completed?.length === 3) {
             alert("You have found all the characters")
         }
     }
     return (
         <>
+            <div className="absolute top-0 left-[40%] bg-red-600 p-2  z-50 flex flex-col items-center justify-center rounded-sm" style={{ display: again ? "flex" : "none" }}>
+                <h1 className="text-3xl text-white">Try Again</h1>
+            </div>
             <div className="flex flex-row items-center justify-center gap-1 p-0.5" style={{ position: 'absolute', top: `${coords.y}`, left: `${coords.x}`, visibility: coords.visible ? 'visible' : 'hidden' }}>
                 <div className=" border-4 rounded-md border-yellow-400 w-12 h-12 shadow-md" />
                 <div className="grid grid-rows-half grid-flow-col place-items-center gap-1">
