@@ -33,11 +33,14 @@ export default function Home() {
       setFiles(fetchedFiles);
     };
 
-    fetchImages();
+    const timeout = setTimeout(() => {
+      fetchImages();
+    }, 2000)
 
     // Cleanup function
     return () => {
       setFiles([]);
+      clearTimeout(timeout)
     };
   }, []);
 
