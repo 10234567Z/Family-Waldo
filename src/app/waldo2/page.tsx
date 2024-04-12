@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { navigate } from "../components/redirectAction";
 
 export default function Home() {
-    const [image, setImage] = useState<Blob | null>(null);
+    const [image, setImage] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [foundWaldo, setFoundWaldo] = useState<boolean>(false);
     const [foundWilma, setFoundWilma] = useState<boolean>(false);
@@ -36,7 +36,7 @@ export default function Home() {
                 ])
                 .select()
 
-            setImage(imageBlob);
+            setImage(URL.createObjectURL(imageBlob));
             setIsLoading(false);
         };
         fetchImage();
@@ -223,7 +223,7 @@ export default function Home() {
                                 <h4>{foundOdlaw ? "*found*" : "Odlaw"}</h4>
                             </div>
                         </div>
-                        <Image onMouseMove={handleImgHover} onClick={handleClick} src={image ? URL.createObjectURL(image) : ''} alt="Logo" width={320} height={400} className=" rounded-md shadow-sm w-[100%]" />
+                        <Image onMouseMove={handleImgHover} onClick={handleClick} src={image} alt="Logo" width={320} height={400} className=" rounded-md shadow-sm w-[100%]" />
                     </div>
             }
         </>
