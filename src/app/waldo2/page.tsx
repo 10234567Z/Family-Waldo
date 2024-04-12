@@ -181,7 +181,7 @@ export default function Home() {
         <>
             <div className="absolute top-0 left-0 w-full h-full bg-black opacity-90 gap-2  p-2  z-50 flex flex-col items-center justify-center rounded-sm translate-x-4 transition-all" style={{ display: success ? "flex" : "none" , transform: success ? "translateX(0)" : "translateX(1rem)"}}>
                 <h1 className="text-2xl text-white">Congratz! You found all characters</h1>
-                <input type="text" placeholder="Enter your name" className="p-2 rounded-md" onChange={(e) => setPlayerName(e.target.value)} value={playerName} required/>
+                <input type="text" placeholder="Enter your name" className="p-2 rounded-md text-black" onChange={(e) => setPlayerName(e.target.value)} value={playerName} required/>
                 <button className="p-2 bg-green-500 text-white rounded-md" onClick={handleSubmit}>Submit</button>
             </div>
             <div className="absolute top-0 left-[40%] bg-red-600 p-2  z-50 flex flex-col items-center justify-center rounded-sm" style={{ display: again ? "flex" : "none" }}>
