@@ -7,24 +7,17 @@ export default function Counter({ image_no }: { image_no: number }) {
     const supabase = createClient()
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setSecond(prev => prev + 1);
+        const interval = setInterval(async() => {
+            const { data , error } = await supabase.from('current_session').select('seconds').eq('image_no', image_no)
+            const seconds = data?.[0].seconds
+            const { error: updateError } = await supabase.from('current_session').update({ seconds: seconds + 1 }).eq('image_no', image_no)
+            setSecond(seconds + 1)
         }, 1000)
 
         return () => {
             clearInterval(interval)
         }
     }, [])
-
-    useEffect(() => {
-        const updateSecond = async () => {
-            const { error } = await supabase.from('current_session').update({ seconds: second }).eq('image_no', image_no)
-            if (error) {
-                console.error(error);
-            }
-        }
-        updateSecond();
-    }, [second])
 
     return (
         <div className="w-[50px]">
