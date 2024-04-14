@@ -2,16 +2,16 @@
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 
-export default function Counter({ image_no , stop}: { image_no: number , stop: boolean}) {
+export default function Counter({ player_name , stop , image_no}: { player_name: string , stop: boolean , image_no: number}) {
     const [second, setSecond] = useState<number>(0);
     const supabase = createClient()
 
     useEffect(() => {
         if(stop === false){
             const interval = setInterval(async() => {
-                const { data , error } = await supabase.from('current_session').select('seconds').eq('image_no', image_no)
+                const { data , error } = await supabase.from(`current_session_${image_no}`).select('seconds').eq('player_name', player_name)
                 const seconds = data?.[0].seconds
-                const { error: updateError } = await supabase.from('current_session').update({ seconds: seconds + 1 }).eq('image_no', image_no)
+                const { error: updateError } = await supabase.from(`current_session_${image_no}`).update({ seconds: seconds + 1 }).eq('player_name', player_name)
             }, 1000)
             return () => {
                 clearInterval(interval)

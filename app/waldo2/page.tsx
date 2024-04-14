@@ -3,8 +3,8 @@ import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import { MouseEventHandler, useEffect, useState } from "react";
 import Counter from "../components/counter";
-import { redirect } from "next/navigation";
 import { navigate } from "../components/redirectAction";
+import PlayerCheck from "../components/playerChecker";
 
 export default function Home() {
     const [image, setImage] = useState<string>('');
@@ -16,36 +16,31 @@ export default function Home() {
     const [coords, setCoords] = useState<{ x: string, y: string, visible: boolean }>({ x: '-10000px', y: '-10000px', visible: false });
     const [percentage, setPercentage] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
     const [again, setAgain] = useState<boolean>(false)
-    const [success, setSuccess] = useState<boolean>(false)
-    const [playerName , setPlayerName] = useState<string>("")
-    const [stop , setStop] = useState<boolean>(false)
+    const [initial, setInitial] = useState<boolean>(true)
+    const [playerName, setPlayerName] = useState<string>("")
+    const [stop, setStop] = useState<boolean>(true)
+    const [error, setError] = useState<boolean>(false)
 
     const supabase = createClient();
+
+    const FinishGame = async () => {
+        const { data: sessionData, error: fetchError } = await supabase.from('current_session_2').select('seconds').eq('player_name', playerName)
+        const seconds = sessionData?.[0].seconds
+        const { data, error } = await supabase.from('Leaderboard_Image_2').insert([{ name: playerName, seconds: seconds }])
+        navigate()
+    }
     useEffect(() => {
         const fetchImage = async () => {
             const { data: imageBlob, error } = await supabase.storage.from('images').download('waldo-p2.jpg');
+            PlayerCheck()
             if (error) {
                 console.error(error);
                 return;
             }
 
-            const { data: insertedRow, error: insertError } = await supabase
-                .from('current_session')
-                .insert([
-                    { no_of_chars: 4, character_completed: [], image_no: 2 },
-                ])
-                .select()
-
             setImage(URL.createObjectURL(imageBlob));
-            setIsLoading(false);
         };
         fetchImage();
-        return () => {
-            const cleanup = async () => {
-                const { error: deleteError } = await supabase.from('current_session').delete().eq('image_no', 2);
-            }
-            cleanup()
-        }
     }, []);
 
     const handleImgHover: MouseEventHandler<HTMLImageElement> | undefined = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
@@ -66,16 +61,27 @@ export default function Home() {
         setPercentage({ x, y });
         setCoords({ x: `${e.clientX - 30}px`, y: `${e.clientY - 30}px`, visible: true })
     }
-
-    const handleSubmit: MouseEventHandler<HTMLButtonElement> | undefined = async(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        const { data: sessionData , error : fetchError } = await supabase.from('current_session').select('seconds').eq('image_no', 2)
-        const seconds = sessionData?.[0].seconds
-        const { data , error } = await supabase.from('Leaderboard_Image_2').insert([{ name: playerName , seconds: seconds}])
-        navigate()
+    const handleSubmit: MouseEventHandler<HTMLButtonElement> | undefined = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        const { data: insertedRow, error: insertError } = await supabase
+            .from('current_session_2')
+            .insert([
+                { no_of_chars: 4, character_completed: [], image_no: 1, player_name: playerName },
+            ])
+            .select()
+        if (insertError) {
+            setError(true)
+        }
+        else {
+            setStop(false)
+            setInitial(false)
+            setIsLoading(false);
+            localStorage.setItem('player', playerName)
+            localStorage.setItem('image_no', '2')
+        }
     }
+
     /** 
-     *
-     *  Handle character choosen clicks
+     * Handle character choosen clicks
      * 
      */
     const handleWaldoClick: MouseEventHandler<HTMLImageElement> | undefined = async (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
@@ -88,7 +94,7 @@ export default function Home() {
         if (foundOdlaw) arr.push('odlaw')
         if (X_CP.includes(percentage.x) && Y_CP.includes(percentage.y)) {
             arr.push('waldo')
-            const { error: updateError } = await supabase.from('current_session').update({ character_completed: arr }).eq('image_no', 2);
+            const { error: updateError } = await supabase.from('current_session_2').update({ character_completed: arr }).eq('player_name', playerName);
             setFoundWaldo(true);
         }
         else {
@@ -96,10 +102,10 @@ export default function Home() {
                 setAgain(true)
             )
         }
-        const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 2);
+        const { data: currentSessionData, error: currentError } = await supabase.from('current_session_2').select().eq('player_name', playerName);
         if (currentSessionData?.[0]?.character_completed?.length === 4) {
             setStop(true)
-            setSuccess(true)
+            FinishGame()
         }
     }
     const handleWilmaClick: MouseEventHandler<HTMLImageElement> | undefined = async (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
@@ -112,7 +118,7 @@ export default function Home() {
         if (foundOdlaw) arr.push('odlaw')
         if (X_CP.includes(percentage.x) && Y_CP.includes(percentage.y)) {
             arr.push('wilma')
-            const { error: updateError } = await supabase.from('current_session').update({ character_completed: arr }).eq('image_no', 2);
+            const { error: updateError } = await supabase.from('current_session_2').update({ character_completed: arr }).eq('player_name', playerName);
             setFoundWilma(true);
         }
         else {
@@ -120,10 +126,10 @@ export default function Home() {
                 setAgain(true)
             )
         }
-        const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 2);
+        const { data: currentSessionData, error: currentError } = await supabase.from('current_session_2').select().eq('player_name', playerName);
         if (currentSessionData?.[0]?.character_completed?.length === 4) {
             setStop(true)
-            setSuccess(true)
+            FinishGame()
         }
     }
     const handleWizardClick: MouseEventHandler<HTMLImageElement> | undefined = async (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
@@ -136,7 +142,7 @@ export default function Home() {
         if (foundOdlaw) arr.push('odlaw')
         if (X_CP.includes(percentage.x) && Y_CP.includes(percentage.y)) {
             arr.push('wizard')
-            const { error: updateError } = await supabase.from('current_session').update({ character_completed: arr }).eq('image_no', 2);
+            const { error: updateError } = await supabase.from('current_session_2').update({ character_completed: arr }).eq('player_name', playerName);
             setFoundWizard(true);
         }
         else {
@@ -144,10 +150,10 @@ export default function Home() {
                 setAgain(true)
             )
         }
-        const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 2);
+        const { data: currentSessionData, error: currentError } = await supabase.from('current_session_2').select().eq('player_name', playerName);
         if (currentSessionData?.[0]?.character_completed?.length === 4) {
             setStop(true)
-            setSuccess(true)
+            FinishGame()
         }
     }
 
@@ -161,7 +167,7 @@ export default function Home() {
         if (foundWizard) arr.push('wizard')
         if (X_CP.includes(percentage.x) && Y_CP.includes(percentage.y)) {
             arr.push('odlaw')
-            const { error: updateError } = await supabase.from('current_session').update({ character_completed: arr }).eq('image_no', 2);
+            const { error: updateError } = await supabase.from('current_session_2').update({ character_completed: arr }).eq('player_name', playerName);
             setFoundOdlaw(true);
         }
         else {
@@ -169,19 +175,20 @@ export default function Home() {
                 setAgain(true)
             )
         }
-        const { data: currentSessionData, error: currentError } = await supabase.from('current_session').select().eq('image_no', 2);
+        const { data: currentSessionData, error: currentError } = await supabase.from('current_session_2').select().eq('player_name', playerName);
         if (currentSessionData?.[0]?.character_completed?.length === 4) {
             setStop(true)
-            setSuccess(true)
+            FinishGame()
         }
     }
 
 
     return (
         <>
-            <div className="absolute top-0 left-0 w-full h-full bg-black opacity-90 gap-2  p-2  z-50 flex flex-col items-center justify-center rounded-sm translate-x-4 transition-all" style={{ display: success ? "flex" : "none" , transform: success ? "translateX(0)" : "translateX(1rem)"}}>
-                <h1 className="text-2xl text-white">Congratz! You found all characters</h1>
-                <input type="text" placeholder="Enter your name" className="p-2 rounded-md text-black" onChange={(e) => setPlayerName(e.target.value)} value={playerName} required/>
+            <div className="absolute top-0 left-0 w-full h-full bg-black opacity-90 gap-2  p-2  z-50 flex flex-col items-center justify-center rounded-sm translate-x-4 transition-all" style={{ display: initial ? "flex" : "none", transform: initial ? "translateX(0)" : "translateX(1rem)" }}>
+                <h1 className="text-2xl text-white">Type your name here..</h1>
+                <input type="text" placeholder="Enter your name" className="p-2 rounded-md text-black" onChange={(e) => setPlayerName(e.target.value)} value={playerName} required />
+                <p style={{ display: error ? 'block' : 'none', color: 'white' }}>Choose a different name</p>
                 <button className="p-2 bg-green-500 text-white rounded-md" onClick={handleSubmit}>Submit</button>
             </div>
             <div className="absolute top-0 left-[40%] bg-red-600 p-2  z-50 flex flex-col items-center justify-center rounded-sm" style={{ display: again ? "flex" : "none" }}>
@@ -205,7 +212,7 @@ export default function Home() {
                     :
                     <div className="flex flex-col items-center justify-start gap-5 w-5/6">
                         <div className="flex flex-row justify-start items-center  w-[100%] bg-black text-white rounded-lg  p-4 gap-4 ">
-                            <Counter image_no={2} stop={stop} />
+                            <Counter image_no={2} player_name={playerName} stop={stop} />
                             <div className="flex flex-col justify-center items-center">
                                 <Image src="/waldo.png" alt="Logo" width={60} height={60} className="w-[60px] h-[60px] rounded-sm" />
                                 <h4>{foundWaldo ? "*found*" : "Waldo"}</h4>

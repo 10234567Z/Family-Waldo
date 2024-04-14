@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { createClient } from "@/utils/supabase/client";
+import PlayerCheck from '../components/playerChecker';
 
 export default function Home() {
   const [files, setFiles] = useState<Blob[]>([]);
